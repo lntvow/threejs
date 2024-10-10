@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "jsx": "preserve",
+    "jsxImportSource": "vue",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true, // 兼容 commonjs 规范
+    "resolveJsonModule": true, // 允许从 .json 文件中导入模块
+    "types": ["vite/client", "node"],
+
+    /* Linting */
+    "strict": true,
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "verbatimModuleSyntax": true
+  },
+  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "vite.config.*"]
+}
