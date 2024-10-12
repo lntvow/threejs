@@ -2,6 +2,7 @@
 import * as THREE from 'three'
 import { onMounted } from 'vue'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import GUI from 'lil-gui'
 import img from '../assets/t3.jpg'
 import { resizeRendererToDisplaySize } from '@/utils'
 
@@ -18,16 +19,24 @@ onMounted(() => {
   const near = 0.1
   const far = 500
   const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
-  camera.position.set(2, 2, 2)
+  camera.position.set(0, 0, 2)
 
   const cubes: Array<any> = []
 
   const loader = new THREE.TextureLoader()
   loader.load(img, texture => {
     const cube = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 36, 36),
+      new THREE.BoxGeometry(1, 1, 1),
       new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide })
     )
+    // const xOffset = 0.5 // offset by half the texture
+    // const yOffset = 0 // offset by 1/4 the texture
+    // texture.offset.set(xOffset, yOffset)
+    // texture.wrapS = THREE.RepeatWrapping
+
+    // texture.center.set(0.5, 0.5)
+    texture.rotation = THREE.MathUtils.degToRad(30)
+
     cubes.push(cube)
     scene.add(cube)
   })
@@ -36,6 +45,14 @@ onMounted(() => {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.update()
+
+  const color = 0xffffff
+  const intensity = 1
+  const light = new THREE.AmbientLight(color, intensity)
+  scene.add(light)
+
+  const gui = new GUI()
+  gui.add(light, 'intensity', 0, 10, 1)
 
   function render(time: number) {
     time *= 0.001

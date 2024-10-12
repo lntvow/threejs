@@ -1,0 +1,237 @@
+<script setup lang="ts">
+import * as THREE from 'three'
+import { onMounted } from 'vue'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import GUI from 'lil-gui'
+
+class MinMaxGUIHelper {
+  obj: any
+  minProp: any
+  maxProp: any
+  minDif: any
+  constructor(obj: THREE.PerspectiveCamera, minProp: string, maxProp: string, minDif: number) {
+    this.obj = obj
+    this.minProp = minProp
+    this.maxProp = maxProp
+    this.minDif = minDif
+  }
+  get min() {
+    return this.obj[this.minProp]
+  }
+  set min(v) {
+    this.obj[this.minProp] = v
+    this.obj[this.maxProp] = Math.max(this.obj[this.maxProp], v + this.minDif)
+  }
+  get max() {
+    return this.obj[this.maxProp]
+  }
+  set max(v) {
+    this.obj[this.maxProp] = v
+    // eslint-disable-next-line no-self-assign
+    this.min = this.min
+  }
+}
+
+onMounted(() => {
+  const canvas = document.querySelector('#c') as HTMLCanvasElement
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+  // renderer.setPixelRatio(window.devicePixelRatio)
+
+  const view1Elem = document.querySelector('#view1') as HTMLElement
+  const view2Elem = document.querySelector('#view2') as HTMLElement
+
+  const fov = 45
+  const aspect = 2 // the canvas default
+  const near = 5
+  const far = 100
+  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+  camera.position.set(0, 10, 20)
+
+  const cameraHelper = new THREE.CameraHelper(camera)
+  const gui = new GUI()
+  gui.add(camera, 'fov', 1, 180)
+  const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1)
+  gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near')
+  gui.add(minMaxGUIHelper, 'max', 0.1, 50, 0.1).name('far')
+
+  const controls = new OrbitControls(camera, view1Elem)
+  controls.target.set(0, 5, 0)
+  controls.update()
+
+  const camera2 = new THREE.PerspectiveCamera(
+    60, // fov
+    2, // aspect
+    0.1, // near
+    500 // far
+  )
+  camera2.position.set(40, 10, 30)
+
+  const controls2 = new OrbitControls(camera2, view2Elem)
+  controls2.target.set(0, 5, 0)
+  controls2.update()
+
+  const scene = new THREE.Scene()
+  scene.background = new THREE.Color('black')
+  scene.add(cameraHelper)
+
+  function resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer) {
+    const canvas = renderer.domElement
+    const width = Math.floor(canvas.clientWidth)
+    const height = Math.floor(canvas.clientHeight)
+    const needResize = canvas.width !== width || canvas.height !== height
+
+    if (needResize) {
+      renderer.setSize(width, height, false)
+    }
+    return needResize
+  }
+
+  {
+    // 地板
+    const planeSize = 40
+
+    const loader = new THREE.TextureLoader()
+    const texture = loader.load('https://threejs.org/manual/examples/resources/images/checker.png')
+    texture.wrapS = THREE.RepeatWrapping
+    texture.wrapT = THREE.RepeatWrapping
+    texture.magFilter = THREE.NearestFilter
+    texture.colorSpace = THREE.SRGBColorSpace
+    const repeats = planeSize / 2
+    texture.repeat.set(repeats, repeats)
+
+    const planeGeo = new THREE.PlaneGeometry(planeSize, planeSize)
+    const planeMat = new THREE.MeshPhongMaterial({
+      map: texture,
+      side: THREE.DoubleSide,
+    })
+    const mesh = new THREE.Mesh(planeGeo, planeMat)
+    mesh.rotation.x = Math.PI * 0.5
+    scene.add(mesh)
+  }
+
+  {
+    // 立方体
+    const cubeSize = 4
+    const cubeGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
+    const cubeMat = new THREE.MeshPhongMaterial({ color: '#8AC' })
+    const mesh = new THREE.Mesh(cubeGeo, cubeMat)
+    mesh.position.set(cubeSize + 1, cubeSize / 2, 0)
+    scene.add(mesh)
+  }
+
+  {
+    // 球体
+    const sphereRadius = 3
+    const sphereWidthDivisions = 32
+    const sphereHeightDivisions = 16
+    const sphereGeo = new THREE.SphereGeometry(sphereRadius, sphereWidthDivisions, sphereHeightDivisions)
+    const sphereMat = new THREE.MeshPhongMaterial({ color: '#CA8' })
+    const mesh = new THREE.Mesh(sphereGeo, sphereMat)
+    mesh.position.set(-sphereRadius - 1, sphereRadius + 2, 0)
+    scene.add(mesh)
+  }
+
+  {
+    const color = 0xffffff
+    const intensity = 3
+    const light = new THREE.DirectionalLight(color, intensity)
+    light.position.set(0, 10, 0)
+    light.target.position.set(-5, 0, 0)
+    scene.add(light)
+    scene.add(light.target)
+  }
+
+  function render() {
+    resizeRendererToDisplaySize(renderer)
+
+    // turn on the scissor
+    renderer.setScissorTest(true)
+
+    // render the original view
+    {
+      const aspect = setScissorForElement(view1Elem)
+      // adjust the camera for this aspect
+      camera.aspect = aspect
+      camera.updateProjectionMatrix()
+      cameraHelper.update()
+      cameraHelper.visible = false
+
+      // don't draw the camera helper in the original view
+      // @ts-ignore
+      scene.background!.set(0x000000)
+
+      // render
+      renderer.render(scene, camera)
+    }
+
+    // render from the 2nd camera
+    {
+      const aspect = setScissorForElement(view2Elem)
+
+      // adjust the camera for this aspect
+      camera2.aspect = aspect
+      camera2.updateProjectionMatrix()
+
+      // draw the camera helper in the 2nd view
+      cameraHelper.visible = true
+      // @ts-ignore
+      scene.background!.set(0x000040)
+
+      renderer.render(scene, camera2)
+    }
+
+    requestAnimationFrame(render)
+  }
+  render()
+
+  function setScissorForElement(elem: HTMLElement) {
+    const canvasRect = canvas.getBoundingClientRect()
+    const elemRect = elem.getBoundingClientRect()
+
+    // compute a canvas relative rectangle
+    const right = Math.min(elemRect.right, canvasRect.right) - canvasRect.left
+    const left = Math.max(0, elemRect.left - canvasRect.left)
+    const bottom = Math.min(elemRect.bottom, canvasRect.bottom) - canvasRect.top
+    const top = Math.max(0, elemRect.top - canvasRect.top)
+
+    const width = Math.min(canvasRect.width, right - left)
+    const height = Math.min(canvasRect.height, bottom - top)
+
+    // setup the scissor to only render to that part of the canvas
+    const positiveYUpBottom = canvasRect.height - bottom
+    renderer.setScissor(left, positiveYUpBottom, width, height)
+    renderer.setViewport(left, positiveYUpBottom, width, height)
+
+    // return the aspect
+    return width / height
+  }
+})
+</script>
+
+<template>
+  <canvas id="c"></canvas>
+  <div class="split">
+    <div id="view1" tabindex="1"></div>
+    <div id="view2" tabindex="2"></div>
+  </div>
+</template>
+
+<style scoped>
+#c {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.split {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+}
+.split > div {
+  width: 100%;
+  height: 100%;
+}
+</style>

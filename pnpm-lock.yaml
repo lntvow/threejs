@@ -11,6 +11,9 @@ importers:
       '@lntvow/dev':
         specifier: ^3.0.2
         version: 3.0.2(@types/eslint@8.56.12)(@types/node@20.16.11)(eslint-plugin-import@2.31.0(@typescript-eslint/parser@7.18.0(eslint@9.12.0(jiti@1.21.6))(typescript@5.6.3))(eslint@9.12.0(jiti@1.21.6)))(jiti@1.21.6)(prettier@3.3.3)(typescript@5.4.5)
+      lil-gui:
+        specifier: ^0.19.2
+        version: 0.19.2
       pinia:
         specifier: ^2.1.7
         version: 2.2.4(typescript@5.4.5)(vue@3.5.11(typescript@5.4.5))
@@ -1918,6 +1921,9 @@ packages:
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
+
+  lil-gui@0.19.2:
+    resolution: {integrity: sha512-nU8j4ND702ouGfQZoaTN4dfXxacvGOAVK0DtmZBVcUYUAeYQXLQAjAN50igMHiba3T5jZyKEjXZU+Ntm1Qs6ZQ==}
 
   lilconfig@3.1.2:
     resolution: {integrity: sha512-eop+wDAvpItUys0FWkHIKeC9ybYrTGbU41U5K7+bttZZeohvnY7M9dZ5kB21GNWiFT2q1OoPTvncPCgSOVO5ow==}
@@ -4968,6 +4974,8 @@ snapshots:
     dependencies:
       prelude-ls: 1.2.1
       type-check: 0.4.0
+
+  lil-gui@0.19.2: {}
 
   lilconfig@3.1.2: {}
 
