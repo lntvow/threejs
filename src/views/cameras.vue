@@ -40,11 +40,7 @@ onMounted(() => {
   const view1Elem = document.querySelector('#view1') as HTMLElement
   const view2Elem = document.querySelector('#view2') as HTMLElement
 
-  const fov = 45
-  const aspect = 2 // the canvas default
-  const near = 5
-  const far = 100
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+  const camera = new THREE.PerspectiveCamera(45, 2, 5, 100)
   camera.position.set(0, 10, 20)
 
   const cameraHelper = new THREE.CameraHelper(camera)

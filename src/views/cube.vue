@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import * as THREE from 'three'
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import GUI from 'lil-gui'
 import { resizeRendererToDisplaySize } from '@/utils'
 
 onMounted(() => {
@@ -24,6 +25,21 @@ onMounted(() => {
   camera.position.z = 5
 
   const geometry = new THREE.BoxGeometry(1, 1, 1)
+  const gui = new GUI()
+
+  onUnmounted(() => gui.destroy())
+
+  const cubeSize = { width: 1, height: 1, depth: 1 }
+
+  gui.add(cubeSize, 'width', 0.5, 5, 0.5).onChange((value: number) => {
+    cubes.forEach(cube => (cube.scale.x = value))
+  })
+  gui.add(cubeSize, 'height', 0.5, 5, 0.5).onChange((value: number) => {
+    cubes.forEach(cube => (cube.scale.y = value))
+  })
+  gui.add(cubeSize, 'depth', 0.5, 5, 0.5).onChange((value: number) => {
+    cubes.forEach(cube => (cube.scale.z = value))
+  })
 
   const canvas = document.getElementById('cube') as HTMLCanvasElement
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })

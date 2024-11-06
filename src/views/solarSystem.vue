@@ -2,26 +2,22 @@
 import * as THREE from 'three'
 import { onMounted } from 'vue'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { resizeRendererToDisplaySize } from '@/utils'
 
 onMounted(() => {
   const scene = new THREE.Scene()
 
-  const fov = 75
-  const aspect = 2
-  const near = 0.1
-  const far = 200
-  const camera = new THREE.PerspectiveCamera(fov, aspect, near, far)
+  const camera = new THREE.PerspectiveCamera(75, 2, 0.1, 200)
   camera.position.y = 30
 
   // 设置光源
   scene.add(new THREE.PointLight(0xffffff, 500))
   // 旋转控制
-  const objects: THREE.Object3D[] = []
+  const axesHelperList: THREE.Object3D[] = []
 
   // 太阳系
   const solarSystem = new THREE.Object3D()
   scene.add(solarSystem)
-  objects.push(solarSystem)
 
   const sphereGeometry = new THREE.SphereGeometry(1, 12, 12)
   const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xffff00 })
@@ -30,39 +26,41 @@ onMounted(() => {
   const sunMesh = new THREE.Mesh(sphereGeometry, sunMaterial)
   sunMesh.scale.set(5, 5, 5)
   solarSystem.add(sunMesh)
-  objects.push(sunMesh)
+  axesHelperList.push(sunMesh)
 
   // 地球的 Object3D
   const earthOrbit = new THREE.Object3D()
-  earthOrbit.position.x = 12
+  // earthOrbit.position.x = 12
   solarSystem.add(earthOrbit)
-  objects.push(earthOrbit)
 
-  // 地球
+  // // 地球
   const earthMesh = new THREE.Mesh(sphereGeometry, new THREE.MeshPhongMaterial({ color: 0x2233ff, emissive: 0x112244 }))
   earthOrbit.add(earthMesh)
-  objects.push(earthMesh)
+  earthMesh.position.x = 12
+
+  axesHelperList.push(earthMesh)
+  // objects.push(earthMesh)
 
   // 月球的 Object3D
-  const moonOrbit = new THREE.Object3D()
-  moonOrbit.position.x = 2
-  earthOrbit.add(moonOrbit)
-  objects.push(moonOrbit)
+  // const moonOrbit = new THREE.Object3D()
+  // moonOrbit.position.x = 2
+  // earthOrbit.add(moonOrbit)
+  // objects.push(moonOrbit)
 
-  // 月球
-  const moonMesh = new THREE.Mesh(sphereGeometry, new THREE.MeshPhongMaterial({ color: 0x888888, emissive: 0x222222 }))
-  moonMesh.scale.set(0.4, 0.4, 0.4)
-  moonOrbit.add(moonMesh)
+  // // 月球
+  // const moonMesh = new THREE.Mesh(sphereGeometry, new THREE.MeshPhongMaterial({ color: 0x888888, emissive: 0x222222 }))
+  // moonMesh.scale.set(0.4, 0.4, 0.4)
+  // moonOrbit.add(moonMesh)
 
-  // 创建月球轨迹（BufferGeometry 和 Line）
-  const maxPoints = 180 // 轨迹线段的最大点数
-  const positions = new Float32Array(maxPoints * 3) // 存储位置的 Float32Array
-  const geometry = new THREE.BufferGeometry()
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  // // 创建月球轨迹（BufferGeometry 和 Line）
+  // const maxPoints = 180 // 轨迹线段的最大点数
+  // const positions = new Float32Array(maxPoints * 3) // 存储位置的 Float32Array
+  // const geometry = new THREE.BufferGeometry()
+  // geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
 
-  // 创建材质并创建轨迹线段
-  const line = new THREE.Line(geometry, new THREE.LineDashedMaterial({ dashSize: 1, gapSize: 0.5 }))
-  scene.add(line)
+  // // 创建材质并创建轨迹线段
+  // const line = new THREE.Line(geometry, new THREE.LineDashedMaterial({ dashSize: 1, gapSize: 0.5 }))
+  // scene.add(line)
 
   const canvas = document.getElementById('solarSystem') as HTMLCanvasElement
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
@@ -71,7 +69,7 @@ onMounted(() => {
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.update()
 
-  objects.forEach(node => {
+  axesHelperList.forEach(node => {
     const axes = new THREE.AxesHelper()
     // @ts-ignore
     axes.material.depthTest = false
@@ -80,7 +78,9 @@ onMounted(() => {
   })
 
   function render(time: number) {
+    // 1s 等于 一天
     time *= 0.001
+    time /= 5
 
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement
@@ -88,11 +88,15 @@ onMounted(() => {
       camera.updateProjectionMatrix()
     }
 
-    objects.forEach((obj, index) => {
-      obj.rotation.y = time
-    })
+    // 太阳自转  一圈需要 25 天
+    // sunMesh.rotation.y = (time / 25) * Math.PI * 2
 
-    updateMoonTrajectory()
+    // 地球公转  一圈需要 365 天
+    // earthOrbit.rotation.y = (time / 365) * Math.PI * 2
+    // 地球自转  一圈需要 1 天
+    earthMesh.rotation.y = time * Math.PI * 2
+
+    // updateMoonTrajectory()
 
     renderer.render(scene, camera)
 
@@ -129,19 +133,6 @@ onMounted(() => {
   }
 
   render(0)
-
-  function resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer) {
-    const pixelRatio = window.devicePixelRatio
-    const canvas = renderer.domElement
-    const width = Math.floor(canvas.clientWidth * pixelRatio)
-    const height = Math.floor(canvas.clientHeight * pixelRatio)
-    const needResize = canvas.width !== width || canvas.height !== height
-
-    if (needResize) {
-      renderer.setSize(width, height, false)
-    }
-    return needResize
-  }
 })
 </script>
 
