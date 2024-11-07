@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import * as THREE from 'three'
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import GUI from 'lil-gui'
 import { resizeRendererToDisplaySize } from '@/utils'
 
 onMounted(() => {
@@ -71,7 +72,7 @@ onMounted(() => {
 
   function render(time: number) {
     // 1s 等于 一天
-    time *= 0.01
+    time = time * 0.001 * timer.rate
     // time /= 10
     if (resizeRendererToDisplaySize(renderer)) {
       const canvas = renderer.domElement
@@ -103,14 +104,22 @@ onMounted(() => {
   const moonPathLine = new THREE.Line(moonPathGeometry, moonPathMaterial)
   scene.add(moonPathLine)
 
-  let i = 0
+  const gui = new GUI()
+  const timer = {
+    rate: 50,
+  }
+  gui.add(timer, 'rate', 20, 100, 1).onChange(() => {
+    moonPathPositions = []
+  })
+  onUnmounted(() => gui.destroy())
+
+  let first = true
 
   function updateMoonTrajectory() {
-    i++
-    if (i % 2 !== 0) return
+    if (first) return (first = false)
     const position = moonMesh.getWorldPosition(new THREE.Vector3())
 
-    if (moonPathPositions.length >= 1600) {
+    if (moonPathPositions.length >= 600) {
       moonPathPositions = moonPathPositions.slice(3)
     }
     moonPathPositions.push(position.x, position.y, position.z)
