@@ -9,7 +9,7 @@ onMounted(() => {
   const scene = new THREE.Scene()
 
   const camera = new THREE.PerspectiveCamera(75, 2, 0.01, 200)
-  camera.position.y = 30
+  camera.position.set(0, 10, 30)
 
   // 设置光源
   scene.add(new THREE.PointLight(0xffffff, 500))
