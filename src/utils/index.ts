@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 export function resizeRendererToDisplaySize(renderer: THREE.WebGLRenderer) {
-  const pixelRatio = 2
+  const pixelRatio = window.devicePixelRatio
   const canvas = renderer.domElement
   const width = Math.floor(canvas.clientWidth * pixelRatio)
   const height = Math.floor(canvas.clientHeight * pixelRatio)
