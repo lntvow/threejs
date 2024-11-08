@@ -35,7 +35,7 @@ onMounted(() => {
     // texture.wrapS = THREE.RepeatWrapping
 
     // texture.center.set(0.5, 0.5)
-    texture.rotation = THREE.MathUtils.degToRad(30)
+    // texture.rotation = THREE.MathUtils.degToRad(30)
 
     cubes.push(cube)
     scene.add(cube)

@@ -100,7 +100,7 @@ onMounted(() => {
 
   let moonPathPositions: number[] = []
   const moonPathGeometry = new THREE.BufferGeometry()
-  const moonPathMaterial = new THREE.LineDashedMaterial({ color: 0xea750f })
+  const moonPathMaterial = new THREE.LineDashedMaterial({ color: 0xea750f, gapSize: 0.2, dashSize: 0.1 })
   const moonPathLine = new THREE.Line(moonPathGeometry, moonPathMaterial)
   scene.add(moonPathLine)
 
@@ -126,6 +126,7 @@ onMounted(() => {
 
     const vertices = new Float32Array(moonPathPositions)
     moonPathGeometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+    moonPathLine.computeLineDistances()
   }
 
   render(0)
