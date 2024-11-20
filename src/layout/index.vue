@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import { routes } from '@/router'
 
 const src = ref(`${location.origin}/threejs/#${routes.value[0].path}`)
 console.log('src: ', src)
 
+const show = ref(true)
 const handleClick = (item: any) => {
+  show.value = false
   src.value = `${location.origin}/threejs/#${item.path}`
+  nextTick(() => {
+    show.value = true
+  })
 }
 </script>
 
@@ -15,7 +20,7 @@ const handleClick = (item: any) => {
     <div class="left">
       <div v-for="(item, index) in routes" :key="index" @click="handleClick(item)">{{ item.meta?.name }}</div>
     </div>
-    <iframe :src="src" frameborder="0" class="right"></iframe>
+    <iframe v-if="show" :src="src" frameborder="0" class="right"></iframe>
   </div>
 </template>
 
