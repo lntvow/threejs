@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import { type RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router'
+import { type RouteRecordRaw, createRouter } from 'vue-router'
 
 export const routes = ref<RouteRecordRaw[]>([])
 

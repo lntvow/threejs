@@ -3,6 +3,7 @@ import { ref } from 'vue'
 import { routes } from '@/router'
 
 const src = ref(`${location.origin}/threejs/#${routes.value[0].path}`)
+console.log('src: ', src)
 
 const handleClick = (item: any) => {
   src.value = `${location.origin}/threejs/#${item.path}`
