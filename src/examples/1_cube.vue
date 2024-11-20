@@ -7,11 +7,10 @@ import Stats from 'stats.js'
 import { resizeRendererToDisplaySize } from '@/utils'
 
 onMounted(() => {
-  const container = document.querySelector('.container') as HTMLElement
-  const gui = new GUI({ container })
+  const gui = new GUI()
   const stats = new Stats()
   stats.showPanel(2)
-  container.appendChild(stats.dom)
+  document.body.appendChild(stats.dom)
   const canvas = document.querySelector('#canvas') as HTMLCanvasElement
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
 
@@ -95,7 +94,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container">
-    <canvas id="canvas"></canvas>
-  </div>
+  <canvas id="canvas"></canvas>
 </template>
