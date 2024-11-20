@@ -9,7 +9,6 @@ import { resizeRendererToDisplaySize } from '@/utils'
 onMounted(() => {
   const gui = new GUI()
   const stats = new Stats()
-  stats.showPanel(2)
   document.body.appendChild(stats.dom)
   const canvas = document.querySelector('#canvas') as HTMLCanvasElement
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })

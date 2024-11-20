@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import * as THREE from 'three'
-import { onMounted } from 'vue'
+import { onMounted, onUnmounted } from 'vue'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
+import Stats from 'stats.js'
 
 class MinMaxGUIHelper {
   obj: any
@@ -33,7 +34,12 @@ class MinMaxGUIHelper {
 }
 
 onMounted(() => {
-  const canvas = document.querySelector('#c') as HTMLCanvasElement
+  const gui = new GUI()
+  const stats = new Stats()
+  stats.showPanel(2)
+  document.body.appendChild(stats.dom)
+
+  const canvas = document.querySelector('#canvas') as HTMLCanvasElement
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
   // renderer.setPixelRatio(window.devicePixelRatio)
 
@@ -44,7 +50,6 @@ onMounted(() => {
   camera.position.set(0, 10, 20)
 
   const cameraHelper = new THREE.CameraHelper(camera)
-  const gui = new GUI()
   gui.add(camera, 'fov', 1, 180)
   const minMaxGUIHelper = new MinMaxGUIHelper(camera, 'near', 'far', 0.1)
   gui.add(minMaxGUIHelper, 'min', 0.1, 50, 0.1).name('near')
@@ -138,6 +143,8 @@ onMounted(() => {
   }
 
   function render() {
+    stats.begin()
+
     resizeRendererToDisplaySize(renderer)
 
     // turn on the scissor
@@ -176,6 +183,7 @@ onMounted(() => {
       renderer.render(scene, camera2)
     }
 
+    stats.end()
     requestAnimationFrame(render)
   }
   render()
@@ -201,11 +209,16 @@ onMounted(() => {
     // return the aspect
     return width / height
   }
+
+  onUnmounted(() => {
+    gui.destroy()
+    stats.dom.remove()
+  })
 })
 </script>
 
 <template>
-  <canvas id="c"></canvas>
+  <canvas id="canvas"></canvas>
   <div class="split">
     <div id="view1" tabindex="1"></div>
     <div id="view2" tabindex="2"></div>
@@ -213,11 +226,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-#c {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
 .split {
   position: absolute;
   left: 0;

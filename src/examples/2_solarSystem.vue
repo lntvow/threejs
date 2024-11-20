@@ -118,7 +118,6 @@ onMounted(() => {
   gui.add(timer, 'rate', 20, 100, 1).onChange(() => {
     moonPathPositions = []
   })
-  onUnmounted(() => gui.destroy())
 
   let first = true
 
@@ -137,6 +136,11 @@ onMounted(() => {
   }
 
   render(0)
+
+  onUnmounted(() => {
+    gui.destroy()
+    stats.dom.remove()
+  })
 })
 </script>
 
