@@ -1,10 +1,10 @@
 import { ref } from 'vue'
-import { type RouteRecordRaw, createRouter, createWebHistory } from 'vue-router'
+import { type RouteRecordRaw, createRouter, createWebHashHistory } from 'vue-router'
 
 export const routes = ref<RouteRecordRaw[]>([])
 
 export const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
