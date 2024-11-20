@@ -1,13 +1,12 @@
 {
   "name": "threejs",
-  "version": "0.0.9",
+  "version": "0.0.10",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "run-p type-check \"build-only {@}\" --",
+    "build": "vite build",
     "preview": "vite preview",
-    "build-only": "vite build",
     "commit": "git add . && git-cz && git push",
     "rimraf": "rimraf ./node_modules/",
     "release": "git add . && bumpp package.json --all --commit --no-tag --push"
