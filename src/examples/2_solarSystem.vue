@@ -3,9 +3,15 @@ import * as THREE from 'three'
 import { onMounted, onUnmounted } from 'vue'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import GUI from 'lil-gui'
+import Stats from 'stats.js'
 import { resizeRendererToDisplaySize } from '@/utils'
 
 onMounted(() => {
+  const gui = new GUI()
+  const stats = new Stats()
+  stats.showPanel(2)
+  document.body.appendChild(stats.dom)
+
   const scene = new THREE.Scene()
 
   const camera = new THREE.PerspectiveCamera(75, 2, 0.01, 200)
@@ -104,7 +110,6 @@ onMounted(() => {
   const moonPathLine = new THREE.Line(moonPathGeometry, moonPathMaterial)
   scene.add(moonPathLine)
 
-  const gui = new GUI()
   const timer = {
     rate: 50,
   }
@@ -134,14 +139,5 @@ onMounted(() => {
 </script>
 
 <template>
-  <canvas id="solarSystem"></canvas>
+  <canvas id="canvas"></canvas>
 </template>
-
-<style scoped>
-#solarSystem {
-  width: 100%;
-  height: 100%;
-  display: block;
-  color: #000;
-}
-</style>
