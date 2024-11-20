@@ -8,23 +8,45 @@ export const router = createRouter({
   routes: [
     {
       path: '/',
-      redirect: '/home',
+      redirect: '/layout',
+    },
+    {
+      path: '/layout',
+      component: () => import('../layout/index.vue'),
     },
   ],
 })
 
 const initRoutes = () => {
-  const componentModules = import.meta.glob('../views/**/**.vue')
+  const componentModules = import.meta.glob('../examples/**/**.vue')
 
   Object.entries(componentModules).forEach(([key, component]) => {
+    const path = key.replace('../examples', '').replace('.vue', '')
     const record: RouteRecordRaw = {
-      path: key.replace('../views', '').replace('.vue', '') || '/',
-      name: key.replace('../views/', '').replace('.vue', '').replace(/\//g, '-'),
+      path,
       component,
     }
+
+    const list = path.slice(1).split('_')
+
+    if (list.length > 1) {
+      record.meta = {
+        sort: parseInt(list[0]),
+        name: list[1].charAt(0).toUpperCase() + list[1].slice(1),
+      }
+    } else {
+      // console.warn(`${record.path} is missing a sort number`)
+      record.meta = {
+        sort: 999,
+        name: list[0].charAt(0).toUpperCase() + list[0].slice(1),
+      }
+    }
+
     routes.value.push(record)
     router.addRoute(record)
   })
+
+  console.log('routes.value: ', routes.value)
 }
 
 // function sortRoutes(children: RouteRecordRaw[]) {

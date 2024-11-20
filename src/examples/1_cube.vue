@@ -2,10 +2,19 @@
 import * as THREE from 'three'
 import { onMounted, onUnmounted } from 'vue'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import GUI from 'lil-gui'
+import { GUI } from 'lil-gui'
+import Stats from 'stats.js'
 import { resizeRendererToDisplaySize } from '@/utils'
 
 onMounted(() => {
+  const container = document.querySelector('.container') as HTMLElement
+  const gui = new GUI({ container })
+  const stats = new Stats()
+  stats.showPanel(2)
+  container.appendChild(stats.dom)
+  const canvas = document.querySelector('#canvas') as HTMLCanvasElement
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
+
   const scene = new THREE.Scene()
 
   // 添加光源
@@ -13,9 +22,7 @@ onMounted(() => {
   light.position.set(-1, 2, 4)
   scene.add(light)
 
-  // 创建平行光辅助对象
-  // const directionalLightHelper = new THREE.DirectionalLightHelper(light, 5)
-  // scene.add(directionalLightHelper)
+  scene.add(new THREE.AmbientLight(0xffffff, 0.2))
 
   const fov = 75
   const aspect = 2
@@ -25,24 +32,18 @@ onMounted(() => {
   camera.position.z = 5
 
   const geometry = new THREE.BoxGeometry(1, 1, 1)
-  const gui = new GUI()
-
-  onUnmounted(() => gui.destroy())
 
   const cubeSize = { width: 1, height: 1, depth: 1 }
 
-  gui.add(cubeSize, 'width', 0.5, 5, 0.5).onChange((value: number) => {
+  gui.add(cubeSize, 'width', 0.5, 1, 0.1).onChange((value: number) => {
     cubes.forEach(cube => (cube.scale.x = value))
   })
-  gui.add(cubeSize, 'height', 0.5, 5, 0.5).onChange((value: number) => {
+  gui.add(cubeSize, 'height', 0.5, 1, 0.1).onChange((value: number) => {
     cubes.forEach(cube => (cube.scale.y = value))
   })
-  gui.add(cubeSize, 'depth', 0.5, 5, 0.5).onChange((value: number) => {
+  gui.add(cubeSize, 'depth', 0.5, 1, 0.1).onChange((value: number) => {
     cubes.forEach(cube => (cube.scale.z = value))
   })
-
-  const canvas = document.getElementById('cube') as HTMLCanvasElement
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
 
   const controls = new OrbitControls(camera, renderer.domElement)
   controls.update()
@@ -79,23 +80,22 @@ onMounted(() => {
       cube.rotation.x = rot
       cube.rotation.y = rot
     })
-    // controls.update()
+    stats.begin()
     renderer.render(scene, camera)
-
+    stats.end()
     requestAnimationFrame(render)
   }
   render(0)
+
+  onUnmounted(() => {
+    gui.destroy()
+    stats.dom.remove()
+  })
 })
 </script>
 
 <template>
-  <canvas id="cube"></canvas>
+  <div class="container">
+    <canvas id="canvas"></canvas>
+  </div>
 </template>
-
-<style scoped>
-#cube {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-</style>

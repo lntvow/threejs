@@ -3,13 +3,7 @@ import { computed } from 'vue'
 import { routes } from '../router'
 
 const routerList = computed(() =>
-  routes.value
-    .filter(item => item.name !== 'home')
-    .map(item => {
-      const record = { to: item.path, name: item.name as string }
-      record.name = record.name.charAt(0).toUpperCase() + record.name.slice(1)
-      return record
-    })
+  routes.value.filter(item => item.path !== '/home').sort((a, b) => a.meta!.sort - b.meta!.sort)
 )
 </script>
 
@@ -19,7 +13,7 @@ const routerList = computed(() =>
     <div class="wrapper">
       <h1 class="title">ThreeJs !</h1>
       <nav>
-        <RouterLink v-for="item in routerList" :key="item.to" :to="item.to">{{ item.name }}</RouterLink>
+        <RouterLink v-for="item in routerList" :key="item.path" :to="item.path">{{ item.meta?.name }}</RouterLink>
       </nav>
     </div>
   </header>

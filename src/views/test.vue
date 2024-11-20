@@ -16,7 +16,7 @@ onMounted(() => {
   rgbeLoader.load('/blue_photo_studio_2k.hdr', texture => {
     // 设置纹理的编码格式
     texture.mapping = THREE.EquirectangularReflectionMapping
-    texture.encoding = THREE.sRGBEncoding
+    // texture.encoding = THREE.sRGBEncoding
 
     // 设置场景的背景和环境贴图
     scene.background = texture

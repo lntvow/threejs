@@ -18,3 +18,18 @@ html {
   height: 100%;
   display: block;
 }
+
+.container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+.lil-gui.root {
+  position: absolute;
+  right: 0;
+  top: 0;
+
+  + div {
+    position: absolute !important;
+  }
+}
