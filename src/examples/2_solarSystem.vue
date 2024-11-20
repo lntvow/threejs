@@ -61,7 +61,7 @@ onMounted(() => {
   moonMesh.position.x = 2
   axesHelperList.push(moonMesh)
 
-  const canvas = document.getElementById('solarSystem') as HTMLCanvasElement
+  const canvas = document.getElementById('canvas') as HTMLCanvasElement
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true })
 
   // 鼠标控制
@@ -99,7 +99,9 @@ onMounted(() => {
 
     updateMoonTrajectory()
 
+    stats.begin()
     renderer.render(scene, camera)
+    stats.end()
 
     requestAnimationFrame(render)
   }
